@@ -1,10 +1,13 @@
 from math import sqrt
-from flask import Flask, json
+import json
+import sys
+import logging
+from flask import Flask, json, request
 
 app = Flask(__name__)
-@app.route('/data')
 
-def simulation():
+def simulation(T_target = 293):
+    data = {"x" : [], "y" : []}
     # Rozmiar pomieszczenia to 2x2x2[m]
     V = 8 # [m^3] pojemność pomnieszczenia
     S = 20 # [m^2] poweirzchnia scian
@@ -20,7 +23,7 @@ def simulation():
     T = [288] # Temperatura początkowa
     T_max = 3000 # Temperatura maksymalna
     T_min = -100 # Temperatura minimalna
-    T_target = 303 # Temperatura zadana
+    # T_target - Temperatura zadana
     T_out = 273 # Temperatura zewnetrzna
 
     # ZMIENNE - parametry kontrolera
@@ -48,7 +51,8 @@ def simulation():
     timeVe = [0.0]
 
 
-    data = {"x" : [], "y" : []}
+
+    
 
 
     for n in range(1, N):
@@ -79,6 +83,15 @@ def jsonise():
     )
     return response
 """
+
+@app.route("/data", methods=["POST", "GET"])
+def starter():
+    if request.method == "POST":
+        jsonData = request.get_json()
+        T_target = jsonData["T_target"]["value"]
+        return simulation(T_target) 
+    else:
+        return simulation()
 if __name__ == '__main__':
     app.run(debug=True)
 

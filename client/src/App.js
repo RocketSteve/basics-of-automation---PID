@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Line  } from 'react-chartjs-2';
 import './App.css';
-import Slider from './Slider';
 import {
   Chart as ChartJS,
   LineElement,
@@ -16,7 +15,6 @@ ChartJS.register(
   LinearScale,
   PointElement
 )
-
 function App() {
 
     const [data, setData] = useState([{}]) 
@@ -30,6 +28,11 @@ function App() {
     });
   },[])
 
+  useEffect(() =>{
+    console.log("data changed")
+  }
+,[data])
+
   const chart = {
     labels: data.x,
     datasets: [{
@@ -42,26 +45,39 @@ function App() {
   };
   const options = {};
 
+  const [value, setValue] = useState(15);
+  const [value2, setValue2] = useState(10);
+
+
+  const submitTarget = async () => {
+    const data = {T_target : {value}}
+
+    const result = await fetch("/data", {
+      method : "POST",
+      mode: "cors",
+      body: JSON.stringify(data),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+
+    const resultJson = await result.json();
+    setData(resultJson);
+    console.log(resultJson)
+  }
 
   return (
-    <div>
-  <div style={{width: "500px", height: "500px", marinLeft: "20px"}}>
+    <div class = "container">
+  <div>
 
     <Line data = {chart} options = {options}></Line>
 
-    {/*
-    {(typeof data.x === 'undefined') ? (
-      <p>Loading...</p>
-    ) : (
-      data.y.map((val, i) => (
-        <p key={i}>{val}</p>
-      ))
-    )}
-    */}
+  
     </div>
-    <div className="App">
-    <Slider />
-    </div>
+     <input max={299} min={273} type="range" value={value} onChange={(e) => setValue(e.target.valueAsNumber)}/><p>{value}</p><br/>
+     <input max={10} type="range" value={value2} onChange={(e) => setValue2(e.target.valueAsNumber)}/><p>{value2}</p><br/>
+
+    <button type="button" onClick ={submitTarget}>Submit</button> 
     </div>
   );
 }
