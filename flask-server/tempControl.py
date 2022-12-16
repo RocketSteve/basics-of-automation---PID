@@ -6,8 +6,8 @@ from flask import Flask, json, request
 
 app = Flask(__name__)
 
-def simulation(T_target = 293):
-    data = {"x" : [], "y" : []}
+def simulation(T_target = 293, T_start = 288, T_out = 273, t_i = 800, t_d = 7, k = 0.8, t = 3600, t_p = 30):
+    data = {"x" : [], "y" : [], "Target" : []}
     # Rozmiar pomieszczenia to 2x2x2[m]
     V = 8 # [m^3] pojemność pomnieszczenia
     S = 20 # [m^2] poweirzchnia scian
@@ -20,24 +20,25 @@ def simulation(T_target = 293):
     penet = 1.7 # [W / (m * K)] Wspołczynnik przenikalności cieplnej ścian 
 
     # [K]
-    T = [288] # Temperatura początkowa
+    T = []
+    T.append(T_start)# Temperatura początkowa
     T_max = 3000 # Temperatura maksymalna
-    T_min = -100 # Temperatura minimalna
+    T_min = 0 # Temperatura minimalna
     # T_target - Temperatura zadana
-    T_out = 273 # Temperatura zewnetrzna
+    # T_out  Temperatura zewnetrzna
 
     # ZMIENNE - parametry kontrolera
-    t_i = 800 # Czas zdwojenia 
-    t_d = 7
-    k = 0.8 # Wzmocnienie regulatora
+    # t_i Czas zdwojenia 
+    # t_d Czas wyprzedzenia
+    # k Wzmocnienie regulatora
 
     # Parametry grzejnika/chłodziarki
     P = [0.0] # Moc ogrzewania
     P_max = 175.0 
     P_min = 115
 
-    t_p = 30 # czas próbkowania [s]
-    t = 3600 # czas trwania symulacji [s]
+    # t_p czas próbkowania [s]
+    # t czas trwania symulacji [s]
     N = int(t/t_p) + 1 # liczba kroków symulacji
 
     e = [1] # Współczynnik uchyb 
@@ -71,25 +72,24 @@ def simulation(T_target = 293):
         
 
         data["x"].append(timeVe[n])
-        data["y"].append(T[n])
+        data["y"].append(T[n] - 273)
+        data["Target"].append(T_target - 273)
 
     return data
-"""
-def jsonise():
-    data = simulation()
-    response = app.response_class(
-        response=json.dumps(data),
-        mimetype='application/json'
-    )
-    return response
-"""
 
 @app.route("/data", methods=["POST", "GET"])
 def starter():
     if request.method == "POST":
         jsonData = request.get_json()
-        T_target = jsonData["T_target"]["value"]
-        return simulation(T_target) 
+        T_target = jsonData["T_target"]
+        T_start = jsonData["T_start"]
+        T_out = jsonData["T_out"]
+        t_i = jsonData["t_i"]
+        t_d = jsonData["t_d"]
+        k = jsonData["k"]
+        t = jsonData["time"]
+        t_p = jsonData["t_p"]
+        return simulation(T_target, T_start, T_out, t_i, t_d, k, t, t_p) 
     else:
         return simulation()
 if __name__ == '__main__':
