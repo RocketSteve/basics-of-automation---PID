@@ -11,6 +11,7 @@ import {
 import {
   Button,
   Grid,
+  GridColumn,
   Icon,
   Segment,
 } from 'semantic-ui-react';
@@ -24,11 +25,6 @@ ChartJS.register(
 function App() {
 
   const [data, setData] = useState([{}]) 
-
-
-  useEffect(() => {
-    fetch("/data").then(console.log("sucess"))
-  })
 
   try {
     useEffect(() => {
@@ -76,6 +72,9 @@ const options = {};
   const [k, setK] = useState(0.8);
   const [time, setTime] = useState(3600);
   const [t_p, setSample] = useState(30);
+  const [flow, setFlow] = useState(0.005);
+  const [penet, setPenet] = useState(1.7);
+
 
 
 
@@ -88,7 +87,9 @@ const options = {};
             t_d,
             k,
             time,
-            t_p
+            t_p,
+            flow,
+            penet
     }
 
 
@@ -145,22 +146,23 @@ const options = {};
       </Grid.Column>
       <Grid.Column>
         <Segment> <h4>Czas zdwojenia: {t_i}</h4>
-     <input max={1000} min={0} type="range" value={t_i} onChange={(e) => setTi(e.target.valueAsNumber)}/></Segment>
+     <input max={1000} min={1} type="range" value={t_i} onChange={(e) => setTi(e.target.valueAsNumber)}/></Segment>
       </Grid.Column>
       <Grid.Column>
         <Segment> <h4>Czas wyprzedzenia: {t_d}s</h4>
-     <input max={50} min={0} type="range" value={t_d} onChange={(e) => setTd(e.target.valueAsNumber)}/></Segment>
+     <input max={50} min={1} type="range" value={t_d} onChange={(e) => setTd(e.target.valueAsNumber)}/></Segment>
       </Grid.Column>
       <Grid.Column>
         <Segment> <h4>Wzmocnienie regulatora: {k}</h4>
-     <input max={10} min={0} type="range" step={0.1} value={k} onChange={(e) => setK(e.target.valueAsNumber)}/></Segment>
+     <input max={10} min={0.1} type="range" step={0.1} value={k} onChange={(e) => setK(e.target.valueAsNumber)}/>
+        </Segment>
       </Grid.Column>
       <Grid.Column>
         <Segment>
           <h4>Czas symulacji: {time}s</h4>
           <input
             type = 'number'
-            min = {0}
+            min = {1}
             value = {time}
             onChange={(e) => setTime(e.target.valueAsNumber)}
           />
@@ -171,19 +173,35 @@ const options = {};
           <h4>Czas próbkowania: {t_p}s</h4>
           <input
             type = 'number'
-            min = {0}
+            min = {1}
             value = {t_p}
             onChange={(e) => setSample(e.target.valueAsNumber)}
           />
         </Segment>
       </Grid.Column>
-      <Grid.Column>
-            <Button primary  type="button" onClick ={submitTarget}>
-              Uruchom symulacje
-            <Icon name='chevron right' />
-            </Button>
-      </Grid.Column>
     </Grid>
+    <Grid columns={2} doubling>
+      <Grid.Column>
+        <Segment> <h4>Współczynnik przepływu okna: {flow}</h4>
+          <input max={0.1} min={0} type="range" step={0.001} value={flow} onChange={(e) => setFlow(e.target.valueAsNumber)}/>
+        </Segment>
+      </Grid.Column>
+      <GridColumn>
+      <Segment> <h4>Współczynnik przenikalności ścian: {penet}</h4>
+          <input max={3} min={0} type="range" step={0.1} value={penet} onChange={(e) => setPenet(e.target.valueAsNumber)}/>
+        </Segment>
+      </GridColumn>
+    </Grid>
+    <Grid>
+    <Button primary  type="button" onClick ={submitTarget}>
+              Uruchom symulacje
+            <Icon name='chevron right'/>
+      </Button>
+    </Grid>
+
+
+
+
     </div>
   );
 }

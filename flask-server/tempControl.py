@@ -6,7 +6,7 @@ from flask import Flask, json, request
 
 app = Flask(__name__)
 
-def simulation(T_target = 293, T_start = 288, T_out = 273, t_i = 800, t_d = 7, k = 0.8, t = 3600, t_p = 30):
+def simulation(T_target = 293, T_start = 288, T_out = 273, t_i = 800, t_d = 7, k = 0.8, t = 3600, t_p = 30, flow = 0.005, penet = 1.7):
     data = {"x" : [], "y" : [], "Target" : []}
     # Rozmiar pomieszczenia to 2x2x2[m]
     V = 8 # [m^3] pojemność pomnieszczenia
@@ -16,8 +16,8 @@ def simulation(T_target = 293, T_start = 288, T_out = 273, t_i = 800, t_d = 7, k
     m_p = V * 1.2
 
     # ZMIENNE
-    flow = 0.005 # [kg / s] Współczynnik przepływu okna
-    penet = 1.7 # [W / (m * K)] Wspołczynnik przenikalności cieplnej ścian 
+    # flow  [kg / s] Współczynnik przepływu okna
+    # penet [W / (m * K)] Wspołczynnik przenikalności cieplnej ścian 
 
     # [K]
     T = []
@@ -34,7 +34,7 @@ def simulation(T_target = 293, T_start = 288, T_out = 273, t_i = 800, t_d = 7, k
 
     # Parametry grzejnika/chłodziarki
     P = [0.0] # Moc ogrzewania
-    P_max = 175.0 
+    P_max = 1750 
     P_min = 115
 
     # t_p czas próbkowania [s]
@@ -89,7 +89,9 @@ def starter():
         k = jsonData["k"]
         t = jsonData["time"]
         t_p = jsonData["t_p"]
-        return simulation(T_target, T_start, T_out, t_i, t_d, k, t, t_p) 
+        flow = jsonData["flow"]
+        penet = jsonData["penet"]
+        return simulation(T_target, T_start, T_out, t_i, t_d, k, t, t_p, flow, penet) 
     else:
         return simulation()
 if __name__ == '__main__':
