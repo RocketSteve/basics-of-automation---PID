@@ -71,7 +71,7 @@ const options = {};
   const [t_d, setTd] = useState(7);
   const [k, setK] = useState(0.8);
   const [time, setTime] = useState(3600);
-  const [t_p, setSample] = useState(30);
+  const [t_p, setSample] = useState(60);
   const [flow, setFlow] = useState(0.005);
   const [penet, setPenet] = useState(1.7);
 
@@ -79,7 +79,7 @@ const options = {};
 
 
   const submitTarget = async () => {
-    const data = { 
+    const dataSent = { 
             T_target,
             T_start,
             T_out,
@@ -96,7 +96,7 @@ const options = {};
     const result = await fetch("/data", {
       method : "POST",
       mode: "cors",
-      body: JSON.stringify(data),
+      body: JSON.stringify(dataSent),
       headers: {
         'Content-Type': 'application/json'
       }
@@ -146,7 +146,7 @@ const options = {};
       </Grid.Column>
       <Grid.Column>
         <Segment> <h4>Czas zdwojenia: {t_i}</h4>
-     <input max={1000} min={1} type="range" value={t_i} onChange={(e) => setTi(e.target.valueAsNumber)}/></Segment>
+     <input max={10000} min={1} type="range" value={t_i} onChange={(e) => setTi(e.target.valueAsNumber)}/></Segment>
       </Grid.Column>
       <Grid.Column>
         <Segment> <h4>Czas wyprzedzenia: {t_d}s</h4>
@@ -197,6 +197,10 @@ const options = {};
               Uruchom symulacje
             <Icon name='chevron right'/>
       </Button>
+      </Segment>
+      </GridColumn>
+  
+  
     </Grid>
 
 
