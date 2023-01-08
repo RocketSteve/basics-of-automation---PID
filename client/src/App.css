@@ -28,6 +28,17 @@
   color: #61dafb;
 }
 
+.ui.div.column   {
+  padding-left: 0rem;
+}
+
+.ui.grid.grid  {
+  padding-top: 0rem;
+  padding-bottom: 0rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);

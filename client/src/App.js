@@ -192,8 +192,10 @@ const options = {};
         </Segment>
       </GridColumn>
     </Grid>
-    <Grid>
-    <Button primary  type="button" onClick ={submitTarget}>
+    <Grid columns={1} doubling>
+      <GridColumn>
+      <Segment color='blue' type='button' onClick={submitTarget}>
+      <Button primary  type="button" onClick ={submitTarget}>
               Uruchom symulacje
             <Icon name='chevron right'/>
       </Button>
