@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Line } from 'react-chartjs-2';
+import 'katex/dist/katex.min.css';
+import { InlineMath } from 'react-katex';
 import './App.css';
 import {
   Chart as ChartJS,
@@ -15,7 +17,7 @@ import {
   Icon,
   Segment,
 } from 'semantic-ui-react';
-
+import Chart from 'chart.js/auto';
 ChartJS.register(
   LineElement,
   CategoryScale,
@@ -48,35 +50,86 @@ function App() {
 const chart = {
   labels: data.x,
   datasets: [{
+    label: 'Temperatura [ºC]',
     data: data.y,
     backgroundColor: 'transparent',
-    borderColor: '#f26c6d',
+    borderColor: '#729EA1',
     pointBorderColor: 'transparent',
     pointBorderWidth: 4
   }, {
+    label: 'Wartość zadana [ºC]',
     data: data.Target,
     backgroundColor: 'transparent',
-    borderColor: '#00ffff',
+    borderColor: '#b5bd89',
     pointBorderColor: 'transparent',
     pointBorderWidth: 4
   }]
 };
-const options = {};
+
+
+
+const options = {
+  scales: {
+    y: {
+        ticks: {
+            callback: function(value, index, ticks) {
+                return value;
+            }
+        }
+    }
+  },
+  legend : {
+    display: true,
+    position: 'bottom'
+  }
+};
+
+const powerChart = {
+  labels: data.x,
+  datasets: [{
+    label: 'Moc grzejnika [W]',
+    data: data.Power,
+    backgroundColor: 'transparent',
+    borderColor: '#dfbe99',
+    pointBorderColor: 'transparent',
+    pointBorderWidth: 4
+  }, { 
+    label: 'Straty ciepła [W]',
+    data: data.Loss,
+    backgroundColor: 'transparent',
+    borderColor: '#ec9192',
+    pointBorderColor: 'transparent',
+    pointBorderWidth: 4
+  }]
+};
+
+const errorChart = {
+  labels: data.x,
+  datasets: [{
+    label: 'Uchyb',
+    data: data.Error,
+    backgroundColor: 'transparent',
+    borderColor: '#db5375',
+    pointBorderColor: 'transparent',
+    pointBorderWidth: 4
+  }]
+};
+
 
 
   const [T_target, setTarget] = useState(293);
   const [T_start, setStart] = useState(288);
   const [T_out, setOut] = useState(273);
-  const [t_i, setTi] = useState(800);
-  const [t_d, setTd] = useState(7);
-  const [k, setK] = useState(0.8);
-  const [time, setTime] = useState(3600);
-  const [t_p, setSample] = useState(60);
+  const [t_i, setTi] = useState(1300);
+  const [t_d, setTd] = useState(2);
+  const [k, setK] = useState(300);
+  const [time, setTime] = useState(7200);
+  const [t_p, setSample] = useState(5);
   const [flow, setFlow] = useState(0.005);
   const [penet, setPenet] = useState(1.7);
 
 
-
+  const inlineFormula = '\\frac{m^{3}}{s}';
 
   const submitTarget = async () => {
     const dataSent = { 
@@ -113,8 +166,25 @@ const options = {};
       <Line 
         data = {chart} 
         options = {options}
+        height = {"40%"}
+        ></Line>
+<Grid columns={2} doubling>
+      <Grid.Column>
+       <Line 
+        data = {powerChart} 
+        options = {options}
         height = {"65%"}
         ></Line>
+      </Grid.Column>
+<Grid.Column>
+    <Line 
+        data = {errorChart} 
+        options = {options}
+        height = {"65%"}
+        ></Line>
+</Grid.Column>
+</Grid>
+      
       </div>
 
     <Grid columns={4} doubling>
@@ -145,27 +215,22 @@ const options = {};
      <input min={253} max={313} type="range" value={T_out} onChange={(e) => setOut(e.target.valueAsNumber)}/></Segment>
       </Grid.Column>
       <Grid.Column>
-        <Segment> <h4>Czas zdwojenia: {t_i}</h4>
+        <Segment> <h4>Czas zdwojenia: {t_i}s</h4>
      <input max={10000} min={1} type="range" value={t_i} onChange={(e) => setTi(e.target.valueAsNumber)}/></Segment>
       </Grid.Column>
       <Grid.Column>
         <Segment> <h4>Czas wyprzedzenia: {t_d}s</h4>
-     <input max={50} min={1} type="range" value={t_d} onChange={(e) => setTd(e.target.valueAsNumber)}/></Segment>
+     <input max={4} min={0.01} step={0.02} type="range" value={t_d} onChange={(e) => setTd(e.target.valueAsNumber)}/></Segment>
       </Grid.Column>
       <Grid.Column>
         <Segment> <h4>Wzmocnienie regulatora: {k}</h4>
-     <input max={10} min={0.1} type="range" step={0.1} value={k} onChange={(e) => setK(e.target.valueAsNumber)}/>
+     <input max={1000} min={0.1} type="range" step={1} value={k} onChange={(e) => setK(e.target.valueAsNumber)}/>
         </Segment>
       </Grid.Column>
       <Grid.Column>
         <Segment>
-          <h4>Czas symulacji: {time}s</h4>
-          <input
-            type = 'number'
-            min = {1}
-            value = {time}
-            onChange={(e) => setTime(e.target.valueAsNumber)}
-          />
+          <h4>Czas symulacji: {time / 3600}h</h4>
+          <input max={24} min={1} type="range" step={1} value={time / 3600} onChange={(e) => setTime(e.target.valueAsNumber * 3600)}/>
         </Segment>
       </Grid.Column>
       <Grid.Column>
@@ -182,12 +247,12 @@ const options = {};
     </Grid>
     <Grid columns={2} doubling>
       <Grid.Column>
-        <Segment> <h4>Współczynnik przepływu okna: {flow}</h4>
-          <input max={0.1} min={0} type="range" step={0.001} value={flow} onChange={(e) => setFlow(e.target.valueAsNumber)}/>
+        <Segment> <h4>Współczynnik przepływu okna: {flow} <InlineMath math={inlineFormula} /></h4>
+          <input max={0.01} min={0} type="range" step={0.001} value={flow} onChange={(e) => setFlow(e.target.valueAsNumber)}/>
         </Segment>
       </Grid.Column>
       <GridColumn>
-      <Segment> <h4>Współczynnik przenikalności ścian: {penet}</h4>
+      <Segment> <h4>Współczynnik przenikalności ścian: {penet}W</h4>
           <input max={3} min={0} type="range" step={0.1} value={penet} onChange={(e) => setPenet(e.target.valueAsNumber)}/>
         </Segment>
       </GridColumn>
