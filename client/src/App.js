@@ -106,7 +106,7 @@ const powerChart = {
 const errorChart = {
   labels: data.x,
   datasets: [{
-    label: 'Uchyb',
+    label: 'Uchyb [ºC]',
     data: data.Error,
     backgroundColor: 'transparent',
     borderColor: '#db5375',
@@ -166,7 +166,7 @@ const errorChart = {
       <Line 
         data = {chart} 
         options = {options}
-        height = {"40%"}
+        height = {"38%"}
         ></Line>
 <Grid columns={2} doubling>
       <Grid.Column>

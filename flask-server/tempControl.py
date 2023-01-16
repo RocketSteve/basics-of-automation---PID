@@ -74,7 +74,7 @@ def simulation(T_target = 293, T_start = 288, T_out = 273, t_i = 1200, t_d = 2, 
         data["y"].append(T[n] - 273)
         data["Target"].append(T_target - 273)
         data["Power"].append(P[-1])
-        data["Error"].append(u[n])
+        data["Error"].append(e[n])
         data["Loss"].append(loss[n])
 
     return data
